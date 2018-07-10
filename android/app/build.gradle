@@ -137,6 +137,9 @@ android {
 }
 
 dependencies {
+    compile ('com.squareup.picasso:picasso:2.71828'){
+        exclude group:"com.android.support"
+    }
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile 'com.android.support:appcompat-v7:23.0.1'
     compile 'com.facebook.react:react-native:+'

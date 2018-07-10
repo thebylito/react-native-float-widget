@@ -5,18 +5,71 @@ import {
   Text,
   View,
   NativeModules,
-  Button
+  Button,
+  DeviceEventEmitter,
+  Alert,
+  TextInput
 } from 'react-native';
 
 const { RNFloatWidget } = NativeModules;
 
 
 export default class App extends Component<Props> {
+  state = {
+    title: '',
+    body: ''
+  }
+  componentDidMount() {
+    DeviceEventEmitter.addListener('widgetClick', () => {
+      Alert.alert('Widget', 'abriu ele');
+      DeviceEventEmitter.removeListener('widgetClick')
+    });
+  }
+
+  generateColor = () => {
+    const color = '#' + Math.random().toString(16).substr(-6);
+    /*  this.setState({
+       color
+     }) */
+    return color;
+  }
+
   render() {
     return (
       <View style={styles.container}>
         <Button title="acao" onPress={() => {
-          RNFloatWidget.start()
+          RNFloatWidget.start(/** Iniciar com parametros {A FAZER: titulo, corpo, imagem, etc... } **/)
+        }} />
+        <Button title="abrir" onPress={() => {
+          RNFloatWidget.openWidget()
+        }} />
+        <Button title="fechar" onPress={() => {
+          RNFloatWidget.closeWidget()
+        }} />
+        <Button title="setColor" onPress={() => {
+          RNFloatWidget.setColor(this.generateColor())
+        }}
+        />
+        <View style={{ flexDirection: 'row' }}>
+          <Button title="setImage1" onPress={() => {
+            RNFloatWidget.setImage('http://i.imgur.com/DvpvklR.png')
+          }}
+          />
+          <Button title="setImage2" onPress={() => {
+            RNFloatWidget.setImage('https://i.imgur.com/HPlo1rm.jpg')
+          }}
+          />
+
+        </View>
+        <TextInput onChangeText={(title) => {
+          this.setState({ title }, () => {
+            RNFloatWidget.setTitle(this.state.title)
+          })
+        }} />
+        <TextInput onChangeText={(body) => {
+          this.setState({ body }, () => {
+            RNFloatWidget.setBody(this.state.body)
+          })
         }} />
       </View>
     );

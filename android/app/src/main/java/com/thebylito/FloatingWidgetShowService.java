@@ -2,24 +2,51 @@ package com.thebylito;
 
 import android.app.Service;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.IBinder;
 import android.graphics.PixelFormat;
+import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.WindowManager;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import com.facebook.react.ReactApplication;
+import com.facebook.react.ReactInstanceManager;
+import com.facebook.react.ReactNativeHost;
+import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.ReactContext;
+import com.facebook.react.bridge.ReactMethod;
+import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.floatingwidget.R;
+import com.squareup.picasso.Picasso;
 
 
-public class FloatingWidgetShowService extends Service{
+public class FloatingWidgetShowService extends Service {
 
 
     WindowManager windowManager;
     View floatingView, collapsedView, expandedView;
-    WindowManager.LayoutParams params ;
+    TextView widgetTitle, widgetBody;
+    ImageView imageIcon;
+    WindowManager.LayoutParams params;
+    ReactContext reactContext = null;
 
     public FloatingWidgetShowService() {
+    }
+
+    private void openWidget() {
+        collapsedView.setVisibility(View.GONE);
+        expandedView.setVisibility(View.VISIBLE);
+    }
+
+    private void closeWidget() {
+        collapsedView.setVisibility(View.VISIBLE);
+        expandedView.setVisibility(View.GONE);
     }
 
     @Override
@@ -29,9 +56,48 @@ public class FloatingWidgetShowService extends Service{
     }
 
     @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        if (intent != null && intent.getAction() != null) {
+            switch (intent.getAction()) {
+                case "ACTION_OPEN_WIDGET": {
+                    openWidget();
+                    break;
+                }
+                case "ACTION_CLOSE_WIDGET": {
+                    closeWidget();
+                    break;
+                }
+                case "ACTION_SETCOLOR_WIDGET": {
+
+                    int newColor = intent.getIntExtra("COLOR", Color.parseColor(String.valueOf("#ffffff")));
+                    expandedView.setBackgroundColor(newColor);
+                }
+                case "ACTION_SET_TITLE_WIDGET": {
+                    String title = intent.getStringExtra("TITLE");
+                    widgetTitle.setText(title);
+                }
+                case "ACTION_SET_BODY_WIDGET": {
+                    String body = intent.getStringExtra("BODY");
+                    widgetBody.setText(body);
+                }
+                case "ACTION_SET_BODY_IMAGE": {
+                    String imgUrl = intent.getStringExtra("URL");
+                    Picasso.get().load(imgUrl).into(imageIcon);
+                }
+            }
+        }
+        return START_STICKY;
+    }
+
+    @Override
     public void onCreate() {
         super.onCreate();
+        final ReactInstanceManager reactInstanceManager =
+                getReactNativeHost().getReactInstanceManager();
+        ReactContext getReactContext = reactInstanceManager.getCurrentReactContext();
+        reactContext = getReactContext;
 
+        Toast.makeText(reactContext, "React context", Toast.LENGTH_LONG).show();
         floatingView = LayoutInflater.from(this).inflate(R.layout.floating_widget_layout, null);
 
         params = new WindowManager.LayoutParams(
@@ -48,25 +114,24 @@ public class FloatingWidgetShowService extends Service{
         expandedView = floatingView.findViewById(R.id.Layout_Expended);
 
         collapsedView = floatingView.findViewById(R.id.Layout_Collapsed);
+        imageIcon = (ImageView) floatingView.findViewById(R.id.WebsiteLogoIcon);
+        widgetTitle = (TextView) floatingView.findViewById(R.id.widgetTitle);
+        widgetBody = (TextView) floatingView.findViewById(R.id.widgetBody);
 
         floatingView.findViewById(R.id.Widget_Close_Icon).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 stopSelf();
-
             }
         });
 
         expandedView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                collapsedView.setVisibility(View.VISIBLE);
-                expandedView.setVisibility(View.GONE);
-
+                closeWidget();
             }
         });
+
 
         floatingView.findViewById(R.id.MainParentRelativeLayout).setOnTouchListener(new View.OnTouchListener() {
             int X_Axis, Y_Axis;
@@ -76,9 +141,6 @@ public class FloatingWidgetShowService extends Service{
             public boolean onTouch(View v, MotionEvent event) {
 
                 switch (event.getAction()) {
-
-                    case MotionEvent.ACTION_BUTTON_PRESS:
-
                     case MotionEvent.ACTION_DOWN:
                         X_Axis = params.x;
                         Y_Axis = params.y;
@@ -104,10 +166,20 @@ public class FloatingWidgetShowService extends Service{
         });
     }
 
+    private void sendEvent(ReactContext reactContext, String eventName, @Nullable WritableMap params) {
+        reactContext
+                .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+                .emit(eventName, params);
+    }
+
     @Override
     public void onDestroy() {
         super.onDestroy();
         if (floatingView != null) windowManager.removeView(floatingView);
+    }
+
+    protected ReactNativeHost getReactNativeHost() {
+        return ((ReactApplication) getApplication()).getReactNativeHost();
     }
 
 }
