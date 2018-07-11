@@ -70,6 +70,13 @@ public class RNFloatWidgetModule extends ReactContextBaseJavaModule {
         intent.putExtra("URL", url);
         reactContext.startService(intent);
     }
-
-
+    @ReactMethod
+    public void showToast(String msg){
+       Toast.makeText(reactContext,msg, Toast.LENGTH_LONG).show();
+    }
+    @ReactMethod
+    public void createButton(){
+        Intent intent = new Intent("ACTION_CREATE_BUTTON", null, reactContext, FloatingWidgetShowService.class);
+        reactContext.startService(intent);
+    }
 }

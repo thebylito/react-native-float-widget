@@ -48,7 +48,10 @@
             <ImageView
                 android:id="@+id/WebsiteLogoIcon"
                 android:layout_width="80dp"
-                android:layout_height="80dp"
+                android:layout_height="94dp"
+                android:layout_gravity="center"
+                android:adjustViewBounds="false"
+                android:cropToPadding="false"
                 android:src="@mipmap/ic_launcher"
                 tools:ignore="ContentDescription" />
 
@@ -68,18 +71,39 @@
                     android:text="React native Floating Widget"
                     android:textAlignment="center"
                     android:textColor="#000"
-                    android:textSize="23dp"
+                    android:textSize="18sp"
                     android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/widgetBody"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="teste cm"
+                    android:text=" sd fsd fsd fds f"
                     android:textAlignment="center"
                     android:textColor="#000"
-                    android:textSize="18dp"
+                    android:textSize="14sp"
                     android:textStyle="bold" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/button1"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Button" />
+
+                    <Button
+                        android:id="@+id/button2"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Button" />
+                </LinearLayout>
+
             </LinearLayout>
 
         </LinearLayout>

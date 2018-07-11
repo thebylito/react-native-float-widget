@@ -17,15 +17,20 @@ const { RNFloatWidget } = NativeModules;
 export default class App extends Component<Props> {
   state = {
     title: '',
-    body: ''
+    body: '',
+    time: null
   }
   componentDidMount() {
-    DeviceEventEmitter.addListener('widgetClick', () => {
-      Alert.alert('Widget', 'abriu ele');
-      DeviceEventEmitter.removeListener('widgetClick')
-    });
+    DeviceEventEmitter.addListener('eventoTeste', this.onClose)
   }
 
+  onClose = ({ time }) => {
+    console.tron.log(time)
+    RNFloatWidget.showToast(time.toString())
+    /*  this.setState({
+       time
+     }) */
+  }
   generateColor = () => {
     const color = '#' + Math.random().toString(16).substr(-6);
     /*  this.setState({
@@ -37,6 +42,7 @@ export default class App extends Component<Props> {
   render() {
     return (
       <View style={styles.container}>
+        <Text>{this.state.time}</Text>
         <Button title="acao" onPress={() => {
           RNFloatWidget.start(/** Iniciar com parametros {A FAZER: titulo, corpo, imagem, etc... } **/)
         }} />
@@ -48,6 +54,10 @@ export default class App extends Component<Props> {
         }} />
         <Button title="setColor" onPress={() => {
           RNFloatWidget.setColor(this.generateColor())
+        }}
+        />
+        <Button title="criar Botao" onPress={() => {
+          RNFloatWidget.createButton()
         }}
         />
         <View style={{ flexDirection: 'row' }}>

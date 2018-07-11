@@ -6,11 +6,17 @@ import android.graphics.Color;
 import android.os.IBinder;
 import android.graphics.PixelFormat;
 import android.support.annotation.Nullable;
+import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,8 +28,12 @@ import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
+import com.floatingwidget.MainActivity;
 import com.floatingwidget.R;
 import com.squareup.picasso.Picasso;
+
+import java.util.Date;
+import java.util.Random;
 
 
 public class FloatingWidgetShowService extends Service {
@@ -55,6 +65,12 @@ public class FloatingWidgetShowService extends Service {
         return null;
     }
 
+    private void createButton(){
+
+
+    }
+
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent != null && intent.getAction() != null) {
@@ -71,18 +87,26 @@ public class FloatingWidgetShowService extends Service {
 
                     int newColor = intent.getIntExtra("COLOR", Color.parseColor(String.valueOf("#ffffff")));
                     expandedView.setBackgroundColor(newColor);
+                    break;
                 }
                 case "ACTION_SET_TITLE_WIDGET": {
                     String title = intent.getStringExtra("TITLE");
                     widgetTitle.setText(title);
+                    break;
                 }
                 case "ACTION_SET_BODY_WIDGET": {
                     String body = intent.getStringExtra("BODY");
                     widgetBody.setText(body);
+                    break;
                 }
                 case "ACTION_SET_BODY_IMAGE": {
                     String imgUrl = intent.getStringExtra("URL");
                     Picasso.get().load(imgUrl).into(imageIcon);
+                    break;
+                }
+                case "ACTION_CREATE_BUTTON": {
+                    createButton();
+                    break;
                 }
             }
         }
@@ -97,7 +121,6 @@ public class FloatingWidgetShowService extends Service {
         ReactContext getReactContext = reactInstanceManager.getCurrentReactContext();
         reactContext = getReactContext;
 
-        Toast.makeText(reactContext, "React context", Toast.LENGTH_LONG).show();
         floatingView = LayoutInflater.from(this).inflate(R.layout.floating_widget_layout, null);
 
         params = new WindowManager.LayoutParams(
@@ -128,6 +151,14 @@ public class FloatingWidgetShowService extends Service {
         expandedView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                WritableMap args = new Arguments().createMap();
+
+                Random rand = new Random();
+                int  n = rand.nextInt(50) + 1;
+                args.putInt("time", n);
+                System.out.println(n);
+                sendEvent(reactContext, "eventoTeste", args);
                 closeWidget();
             }
         });
