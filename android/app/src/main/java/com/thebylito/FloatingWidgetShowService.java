@@ -3,6 +3,7 @@ package com.thebylito;
 import android.app.Service;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.IBinder;
 import android.graphics.PixelFormat;
 import android.support.annotation.Nullable;
@@ -126,12 +127,13 @@ public class FloatingWidgetShowService extends Service {
         params = new WindowManager.LayoutParams(
                 WindowManager.LayoutParams.WRAP_CONTENT,
                 WindowManager.LayoutParams.WRAP_CONTENT,
-                2038,
+                WindowManager.LayoutParams.TYPE_PHONE,
                 WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
                 PixelFormat.TRANSLUCENT);
 
         windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
 
+        assert windowManager != null;
         windowManager.addView(floatingView, params);
 
         expandedView = floatingView.findViewById(R.id.Layout_Expended);
